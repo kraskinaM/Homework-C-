@@ -1,33 +1,33 @@
 using System;
 using System.Diagnostics;
-using System.Text;
 
-class Program
+int n = 35; 
+long calls = 0;
+
+var sw = Stopwatch.StartNew();
+long naive = FibNaive(n);
+sw.Stop();
+long naiveMs = sw.ElapsedMilliseconds;
+long naiveCalls = calls;
+
+calls = 0;
+sw = Stopwatch.StartNew();
+long[] cache = new long[n + 1];
+long fast = FibMemo(n, cache);
+sw.Stop();
+Console.WriteLine(n + " : наивный " + naiveCalls + " вызовов, " + naiveMs + " мс" + " | кэш: " + calls + " вызовов, " + sw.ElapsedMilliseconds + " мс" + " | результат " + naive + " = " + fast);
+long FibNaive(int k)
 {
-    static void Main()
-    {
-        int lines = 10000; 
+    calls++; 
+    if (k <= 1) return k;
+    return FibNaive(k - 1) + FibNaive(k - 2);
+}
 
-        Console.WriteLine($"Запуск замера для {lines} строк...");
-        
-        var sw1 = Stopwatch.StartNew();
-        string report = "";
-        for (int i = 0; i < lines; i++)
-        {
-            report = report + "строка " + i + ": заказ обработан" + Environment.NewLine;
-        }
-        sw1.Stop();
-        Console.WriteLine("1. Склейка строкой (+): " + sw1.ElapsedMilliseconds + " мс");
-        
-        var sw2 = Stopwatch.StartNew();
-        var sb = new StringBuilder();
-        for (int i = 0; i < lines; i++)
-        {
-            sb.AppendLine("строка " + i + ": заказ обработан");
-        }
-        string report2 = sb.ToString();
-        sw2.Stop();
-        Console.WriteLine("2. StringBuilder:" + sw2.ElapsedMilliseconds + " мс");
-        
-    }
+long FibMemo(int k, long[] cache)
+{
+    calls++;
+    if (k <= 1) return k;
+    if (cache[k] != 0) return cache[k]; 
+    cache[k] = FibMemo(k - 1, cache) + FibMemo(k - 2, cache);
+    return cache[k];
 }
